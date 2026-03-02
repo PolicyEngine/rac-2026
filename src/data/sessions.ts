@@ -1,4 +1,4 @@
-export type Track = 'Track 1' | 'Track 2' | 'Track 3' | 'Tracks 1&2';
+export type Track = 'Track 1' | 'Track 2' | 'Track 3' | 'Tracks 1&2' | 'Plenary';
 
 export type Session = {
   id: number;
@@ -14,7 +14,43 @@ export type Session = {
 
 export const sessions: Session[] = [
   // === March 10 ===
-  // Round 1
+  // Plenary
+  {
+    id: 33,
+    title: 'Opening and Welcome',
+    speakers: ['Eva den Dunnen-Heijblom', 'Ellen Kiersch'],
+    track: 'Plenary',
+    description: 'Official opening and welcome to the Rules as Code 2026 conference.',
+    day: 'March 10',
+    time: '10:00\u201310:30',
+    round: 0,
+    tags: ['opening'],
+  },
+  {
+    id: 34,
+    title: 'Keynote: Rules as Code in an Interoperable Europe',
+    speakers: ['Kristoffer Olsen', 'Felicitas Bitzenhofer'],
+    track: 'Plenary',
+    description:
+      'Scaling Rules as Code across government levels and borders. SEMIC conference findings and the Interoperable Europe Act framework.',
+    day: 'March 10',
+    time: '10:30\u201311:00',
+    round: 0,
+    tags: ['keynote', 'EU', 'interoperability'],
+  },
+  {
+    id: 35,
+    title: 'State of Play: Interactive Plenary Panel',
+    speakers: ['Wouter Welling'],
+    track: 'Plenary',
+    description:
+      'Interactive plenary panel session surveying the current state of Rules as Code initiatives worldwide.',
+    day: 'March 10',
+    time: '11:30\u201312:30',
+    round: 1,
+    tags: ['panel', 'plenary'],
+  },
+  // Round 2
   {
     id: 1,
     title: 'Using AI4DRPM for Rules as Code',
@@ -24,7 +60,7 @@ export const sessions: Session[] = [
       'Framework for annotating legal acts with new vocabularies related to the Interoperable Europe Act.',
     day: 'March 10',
     time: '13:30\u201314:40',
-    round: 1,
+    round: 2,
     tags: ['EU', 'interoperability', 'frameworks'],
   },
   {
@@ -36,7 +72,7 @@ export const sessions: Session[] = [
       'Addresses government automation transparency \u2014 decision pathway tracing, code validation, and citizen-understandable outcome communication.',
     day: 'March 10',
     time: '13:30\u201314:40',
-    round: 1,
+    round: 2,
     tags: ['explainability', 'ALEF', 'transparency'],
   },
   {
@@ -48,7 +84,7 @@ export const sessions: Session[] = [
       'Overview of international Rules as Code experiments, success stories, challenges, and convergence toward interoperable approaches.',
     day: 'March 10',
     time: '13:30\u201314:40',
-    round: 1,
+    round: 2,
     tags: ['OECD', 'international', 'governance'],
   },
   {
@@ -57,7 +93,7 @@ export const sessions: Session[] = [
     speakers: [
       'Robert van Doesburg',
       'Robert Goen\u00e9',
-      'Sandra Chakrou',
+      'Sandra Chakroun',
       'Mads Adam',
       'Eirini Andriopoulou',
       'Tomas Algotsson',
@@ -68,10 +104,10 @@ export const sessions: Session[] = [
       'Expert introductions followed by panel discussion covering interpretation schemes, functional rule uses, cross-language translation, and regulation interpretation\u2019s role.',
     day: 'March 10',
     time: '13:30\u201315:40',
-    round: 1,
+    round: 2,
     tags: ['panel', 'tools', 'interpretation'],
   },
-  // Round 2
+  // Round 3
   {
     id: 5,
     title: 'Building a Rules as Code Community',
@@ -81,19 +117,19 @@ export const sessions: Session[] = [
       'Creating a Dutch RaC community with governance focus, common working approaches, and craftsmanship development.',
     day: 'March 10',
     time: '14:40\u201315:40',
-    round: 2,
+    round: 3,
     tags: ['community', 'governance', 'netherlands'],
   },
   {
     id: 6,
     title: 'NRML \u2014 Normalised Rule Model Language',
-    speakers: ['Wouter Berman'],
+    speakers: ['Wouter Berman', 'Anne Schuth'],
     track: 'Track 2',
     description:
       'Capturing the semantics of rules in an interoperable format \u2014 bridging everyday legal meaning with machine-readable logic.',
     day: 'March 10',
     time: '14:40\u201315:40',
-    round: 2,
+    round: 3,
     tags: ['DSL', 'interoperability', 'ALEF'],
   },
   {
@@ -105,7 +141,7 @@ export const sessions: Session[] = [
       'Citation network analysis of 1,042 Supreme Court tax decisions using graph theory; planned NLP integration for precedent prioritization.',
     day: 'March 10',
     time: '14:40\u201315:40',
-    round: 2,
+    round: 3,
     tags: ['research', 'graph-theory', 'tax'],
   },
   {
@@ -117,8 +153,20 @@ export const sessions: Session[] = [
       'HORIZON Europe project developing AI tools for mass deliberation. Recommendations on EU text standards, interoperability, and linguistic infrastructure.',
     day: 'March 10',
     time: '14:40\u201315:40',
-    round: 2,
+    round: 3,
     tags: ['AI', 'democracy', 'EU'],
+  },
+  {
+    id: 40,
+    title: 'RaC on the Policy Agenda: State of 2026',
+    speakers: [],
+    track: 'Track 1',
+    description:
+      'Open floor discussion \u2014 an invitation to share where your country stands regarding Rules as Code advancement and scaling initiatives.',
+    day: 'March 10',
+    time: '14:40\u201315:40',
+    round: 3,
+    tags: ['open-floor', 'international', 'governance'],
   },
   {
     id: 9,
@@ -129,10 +177,10 @@ export const sessions: Session[] = [
       'Philosophy of technology perspective on the ethics/codes relationship. Guidance ethics methodology applied to spatial planning chatbot.',
     day: 'March 10',
     time: '14:40\u201315:40',
-    round: 2,
+    round: 3,
     tags: ['ethics', 'philosophy'],
   },
-  // Round 3
+  // Round 4
   {
     id: 10,
     title: 'Implicit Temporal Reasoning for Executable Legal Rules',
@@ -142,7 +190,7 @@ export const sessions: Session[] = [
       'Execution model automating temporal aspects \u2014 rules written at a single timepoint while handling duration, proportional values, and period-based conditions.',
     day: 'March 10',
     time: '16:00\u201317:00',
-    round: 3,
+    round: 4,
     tags: ['temporal-logic', 'ALEF', 'engineering'],
   },
   {
@@ -154,7 +202,7 @@ export const sessions: Session[] = [
       'Software engineering lessons for maintainable RaC codebases. Abstractions, modules, testing, and project management enabling 10k\u2013100k+ line code scaling.',
     day: 'March 10',
     time: '16:00\u201317:00',
-    round: 3,
+    round: 4,
     tags: ['Catala', 'engineering', 'DSL'],
   },
   {
@@ -166,7 +214,7 @@ export const sessions: Session[] = [
       'Open-access interdisciplinary courses addressing legality, transparency, and efficiency. Modular approach for legal, IT, public administration professionals.',
     day: 'March 10',
     time: '16:00\u201317:00',
-    round: 3,
+    round: 4,
     tags: ['education', 'curriculum'],
   },
   {
@@ -178,8 +226,20 @@ export const sessions: Session[] = [
       'Domain-specific language integrating RaC into software engineering. Automated reasoning for compliance; GDPR/data governance case study.',
     day: 'March 10',
     time: '16:00\u201317:00',
-    round: 3,
+    round: 4,
     tags: ['eFLINT', 'DSL', 'compliance'],
+  },
+  {
+    id: 39,
+    title: 'Radical Transparency',
+    speakers: ['Jolein Baidenmann'],
+    track: 'Track 1',
+    description:
+      'How Rules as Code enables clearer communication about government decision-making and connections with open government initiatives.',
+    day: 'March 10',
+    time: '16:00\u201317:00',
+    round: 4,
+    tags: ['transparency', 'open-government', 'netherlands'],
   },
   {
     id: 14,
@@ -189,10 +249,34 @@ export const sessions: Session[] = [
     description: 'Interoperability lessons from the EU E-justice program.',
     day: 'March 10',
     time: '16:00\u201317:00',
-    round: 3,
+    round: 4,
     tags: ['EU', 'justice', 'interoperability'],
   },
+  {
+    id: 36,
+    title: 'Wrap-up Day 1',
+    speakers: ['Wouter Welling'],
+    track: 'Plenary',
+    description: 'Day 1 closing summary and reflections.',
+    day: 'March 10',
+    time: '17:00\u201317:30',
+    round: 5,
+    tags: ['wrap-up', 'plenary'],
+  },
   // === March 11 ===
+  // Plenary
+  {
+    id: 37,
+    title: "Keynote: From Napoleon\u2019s Code Civil to Law as Code",
+    speakers: ['Hilde Hardeman'],
+    track: 'Plenary',
+    description:
+      'Historical perspective on legal clarity \u2014 from Napoleon\u2019s Code to contemporary Rules as Code approaches. A quest for clarity and accessibility.',
+    day: 'March 11',
+    time: '10:00\u201310:40',
+    round: 0,
+    tags: ['keynote', 'EU', 'history'],
+  },
   // Round 1
   {
     id: 15,
@@ -247,14 +331,18 @@ export const sessions: Session[] = [
     title: 'How to Scale-up Rules as Code Solutions',
     speakers: [
       'Alex Borg',
-      'Thomas Guillet',
-      'Andreas Triantafyllidis',
-      'Wouter Berman',
       'Robert van Doesburg',
+      'Kathleen Jennrich',
+      'Martijn Ligthart',
+      'Thomas Guillet',
+      'Matti Schneider',
+      'Wouter Berman',
+      'Andreas Triantafyllidis',
+      'Natalie Cohen',
     ],
     track: 'Tracks 1&2',
     description:
-      'Panel on ALEF lessons, domain/scaling opportunities, and innovation agenda development. Combining government, business, and academia strengths.',
+      'Panel on scaling beyond current domains, organizational challenges, and building an Innovation Agenda. Combining government, business, and academia strengths.',
     day: 'March 11',
     time: '10:40\u201312:50',
     round: 1,
@@ -281,7 +369,7 @@ export const sessions: Session[] = [
     description:
       'Controlled natural language rule specification, legal scenario validation, production execution. Enables nine times faster law changes. Over 100 million annual decisions.',
     day: 'March 11',
-    time: '11:50\u201312:50',
+    time: '11:55\u201312:50',
     round: 2,
     tags: ['ALEF', 'DSL', 'production'],
   },
@@ -293,19 +381,31 @@ export const sessions: Session[] = [
     description:
       'Visual, human/machine-readable structured models transforming legislation. Germany\u2019s 2025 Modernisation Agenda official implementation path.',
     day: 'March 11',
-    time: '11:50\u201312:50',
+    time: '11:55\u201312:50',
     round: 2,
     tags: ['Rulemapping', 'germany', 'visual'],
   },
   {
+    id: 41,
+    title: 'Public Rule Management Architecture for NORA / EIRA',
+    speakers: ['Bas Kaptijn'],
+    track: 'Track 3',
+    description:
+      'Introducing a Public Rule Management Architecture integrating Digital Ready Policy Making and Rules as Code into service modeling frameworks.',
+    day: 'March 11',
+    time: '11:55\u201312:50',
+    round: 2,
+    tags: ['architecture', 'NORA', 'EIRA'],
+  },
+  {
     id: 23,
     title: 'Early Steps Most Important: Digital-Ready Legislation',
-    speakers: ['Styne Nygaard', 'Mads Adam'],
+    speakers: ['Stine Nygaard', 'Mads Adam'],
     track: 'Track 1',
     description:
       'Danish secretariat for digital-ready legislation supporting early legislative process engagement and policy-maker assistance.',
     day: 'March 11',
-    time: '11:50\u201312:50',
+    time: '11:55\u201312:50',
     round: 2,
     tags: ['denmark', 'digital-ready', 'governance'],
   },
@@ -419,6 +519,17 @@ export const sessions: Session[] = [
     round: 4,
     tags: ['scaling', 'funding', 'netherlands'],
   },
+  {
+    id: 38,
+    title: 'Wrap-up Day 2',
+    speakers: ['Wouter Welling'],
+    track: 'Plenary',
+    description: 'Conference closing summary and next steps.',
+    day: 'March 11',
+    time: '16:00\u201316:30',
+    round: 5,
+    tags: ['wrap-up', 'plenary'],
+  },
 ];
 
 export const trackColors: Record<Track, string> = {
@@ -426,6 +537,7 @@ export const trackColors: Record<Track, string> = {
   'Track 2': '#059669',
   'Track 3': '#9333EA',
   'Tracks 1&2': '#D97706',
+  'Plenary': '#DC2626',
 };
 
 export const trackLabels: Record<Track, string> = {
@@ -433,4 +545,5 @@ export const trackLabels: Record<Track, string> = {
   'Track 2': 'Community & Tools',
   'Track 3': 'Engineering',
   'Tracks 1&2': 'Joint Panel',
+  'Plenary': 'Plenary',
 };

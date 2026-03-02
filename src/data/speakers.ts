@@ -29,6 +29,20 @@ export const speakers: Speaker[] = [
     tags: [],
   },
   {
+    name: 'Eva den Dunnen-Heijblom',
+    role: 'Conference Host',
+    org: '',
+    bio: 'Opening and welcome presenter for the Rules as Code 2026 conference.',
+    tags: ['host'],
+  },
+  {
+    name: 'Ellen Kiersch',
+    role: 'Conference Host',
+    org: '',
+    bio: 'Opening and welcome presenter for the Rules as Code 2026 conference.',
+    tags: ['host'],
+  },
+  {
     name: 'Davide Audrito',
     role: 'Legal & Semantic Interoperability Expert',
     org: 'EU DG DIGIT',
@@ -78,7 +92,7 @@ export const speakers: Speaker[] = [
     tags: ['GovTech', 'EU'],
   },
   {
-    name: 'Sandra Chakrou',
+    name: 'Sandra Chakroun',
     role: 'Contributor',
     org: 'OpenFisca',
     bio: '',
@@ -155,11 +169,25 @@ export const speakers: Speaker[] = [
     tags: ['EU', 'governance'],
   },
   {
+    name: 'Jolein Baidenmann',
+    role: 'Policy Advisor',
+    org: 'Ministry of the Interior and Kingdom Relations NL',
+    bio: 'Examines how Rules as Code enables radical transparency in government decision-making and connections with open government initiatives.',
+    tags: ['transparency', 'open-government'],
+  },
+  {
     name: 'Andrzej J\u00f3zefczyk',
     role: 'Senior Specialist',
     org: 'DORA, Poland',
     bio: 'Works at intersection of policy evaluation and technology with data science expertise.',
     tags: ['poland', 'data-science'],
+  },
+  {
+    name: 'Kathleen Jennrich',
+    role: 'Representative',
+    org: 'German Federal Ministry',
+    bio: 'Panelist on scaling Rules as Code solutions across government.',
+    tags: ['germany', 'governance'],
   },
   {
     name: 'Bas Kaptijn',
@@ -190,6 +218,20 @@ export const speakers: Speaker[] = [
     tags: ['Catala', 'DSL'],
   },
   {
+    name: 'Matti Schneider',
+    role: 'Contributor',
+    org: 'OpenFisca',
+    bio: 'Contributes to the OpenFisca open-source project for computing the impact of legislation.',
+    tags: ['OpenFisca', 'open-source'],
+  },
+  {
+    name: 'Martijn Ligthart',
+    role: 'Representative',
+    org: 'Dutch Environment/Planning Act',
+    bio: 'Panelist on scaling Rules as Code solutions beyond traditional domains.',
+    tags: ['netherlands', 'environment'],
+  },
+  {
     name: 'Alexandros Melidis',
     role: 'Director',
     org: 'Greek Free Open Source Software Society',
@@ -218,7 +260,7 @@ export const speakers: Speaker[] = [
     tags: ['EU', 'regulation'],
   },
   {
-    name: 'Styne Nygaard',
+    name: 'Stine Nygaard',
     role: 'Policy Officer',
     org: 'Danish Agency for Digital Government',
     bio: 'Works in Secretariat for Digital-Ready Legislation, advising ministries on rule design for coding.',

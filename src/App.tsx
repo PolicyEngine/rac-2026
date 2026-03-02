@@ -1,13 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { speakers, Speaker } from './data/speakers';
-import { sessions, Session, Track, trackColors, trackLabels } from './data/sessions';
+import { sessions, Session, trackColors, trackLabels } from './data/sessions';
+import { useConferenceData } from './hooks/useConferenceData';
 
 const ff = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 const mono = "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace";
 
 type Tab = 'schedule' | 'speakers';
 type DayFilter = 'all' | 'March 10' | 'March 11';
-type TrackFilter = 'all' | Track;
+type UserName = 'Pavel' | 'Vahid';
 
 /* ── tiny helpers ───────────────────────── */
 
@@ -82,9 +83,68 @@ function Pill({
   );
 }
 
+/* ── Attendance Circle ─────────────────── */
+
+function AttendanceCircle({
+  letter,
+  filled,
+  isCurrentUser,
+  onClick,
+}: {
+  letter: string;
+  filled: boolean;
+  isCurrentUser: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <div
+      onClick={
+        isCurrentUser
+          ? (e) => {
+              e.stopPropagation();
+              onClick?.();
+            }
+          : undefined
+      }
+      title={
+        letter === 'P' ? (filled ? 'Pavel attending' : 'Pavel not attending')
+        : filled ? 'Vahid attending' : 'Vahid not attending'
+      }
+      style={{
+        width: '22px',
+        height: '22px',
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '10px',
+        fontWeight: 700,
+        fontFamily: ff,
+        cursor: isCurrentUser ? 'pointer' : 'default',
+        background: filled ? '#22C55E' : 'transparent',
+        color: filled ? '#FFF' : '#94A3B8',
+        border: filled ? '2px solid #22C55E' : '2px solid #CBD5E1',
+        transition: 'all 0.15s ease',
+      }}
+    >
+      {letter}
+    </div>
+  );
+}
+
 /* ── Session Card ───────────────────────── */
 
-function SessionCard({ s }: { s: Session }) {
+function SessionCard({
+  s,
+  currentUser,
+  isAttending,
+  onToggle,
+}: {
+  s: Session;
+  currentUser: UserName | null;
+  isAttending: (sessionId: number, userName: UserName) => boolean;
+  onToggle: (sessionId: number) => void;
+}) {
   const [open, setOpen] = useState(false);
   const tc = trackColors[s.track];
   return (
@@ -104,6 +164,20 @@ function SessionCard({ s }: { s: Session }) {
           <Badge label={s.track} bg={tc + '18'} color={tc} />
           <Badge label={trackLabels[s.track]} bg="#F8FAFC" color="#64748B" />
           <span style={{ fontSize: '12px', color: '#94A3B8', fontFamily: mono }}>{s.time}</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
+            <AttendanceCircle
+              letter="P"
+              filled={isAttending(s.id, 'Pavel')}
+              isCurrentUser={currentUser === 'Pavel'}
+              onClick={() => onToggle(s.id)}
+            />
+            <AttendanceCircle
+              letter="V"
+              filled={isAttending(s.id, 'Vahid')}
+              isCurrentUser={currentUser === 'Vahid'}
+              onClick={() => onToggle(s.id)}
+            />
+          </div>
         </div>
         <div
           style={{
@@ -155,7 +229,18 @@ function SessionCard({ s }: { s: Session }) {
 
 /* ── Speaker Card ───────────────────────── */
 
-function SpeakerCard({ sp }: { sp: Speaker }) {
+function SpeakerCard({
+  sp,
+  currentUser,
+  getNote,
+  onSaveNote,
+}: {
+  sp: Speaker;
+  currentUser: UserName | null;
+  getNote: (speakerName: string, userName: UserName) => string;
+  onSaveNote: (speakerName: string, text: string) => void;
+}) {
+  const [notesOpen, setNotesOpen] = useState(false);
   const initials = sp.name
     .split(' ')
     .map((w) => w[0])
@@ -163,6 +248,11 @@ function SpeakerCard({ sp }: { sp: Speaker }) {
     .slice(0, 2);
   const speakerSessions = sessions.filter((s) => s.speakers.includes(sp.name));
   const hue = sp.name.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 360;
+
+  const otherUser: UserName | null = currentUser === 'Pavel' ? 'Vahid' : currentUser === 'Vahid' ? 'Pavel' : null;
+  const myNote = currentUser ? getNote(sp.name, currentUser) : '';
+  const otherNote = otherUser ? getNote(sp.name, otherUser) : '';
+  const hasAnyNotes = myNote.length > 0 || otherNote.length > 0;
 
   return (
     <div
@@ -282,6 +372,165 @@ function SpeakerCard({ sp }: { sp: Speaker }) {
           ))}
         </div>
       )}
+
+      {/* ── Notes section ── */}
+      <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: '10px' }}>
+        <button
+          onClick={() => setNotesOpen(!notesOpen)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontFamily: ff,
+            fontSize: '10px',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.8px',
+            color: '#94A3B8',
+          }}
+        >
+          Notes
+          {hasAnyNotes && (
+            <span
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: '#3B82F6',
+                display: 'inline-block',
+              }}
+            />
+          )}
+          <span style={{ fontSize: '14px', lineHeight: 1 }}>{notesOpen ? '\u25B4' : '\u25BE'}</span>
+        </button>
+
+        {notesOpen && (
+          <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {currentUser && (
+              <div>
+                <div
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: '#475569',
+                    fontFamily: ff,
+                    marginBottom: '4px',
+                  }}
+                >
+                  Your notes ({currentUser})
+                </div>
+                <textarea
+                  defaultValue={myNote}
+                  placeholder="Add notes about this speaker..."
+                  onBlur={(e) => onSaveNote(sp.name, e.target.value)}
+                  onChange={(e) => onSaveNote(sp.name, e.target.value)}
+                  style={{
+                    width: '100%',
+                    minHeight: '60px',
+                    padding: '8px 10px',
+                    fontSize: '12px',
+                    fontFamily: ff,
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '6px',
+                    resize: 'vertical',
+                    outline: 'none',
+                    color: '#0F172A',
+                    background: '#FAFBFC',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+            )}
+            {otherUser && otherNote && (
+              <div>
+                <div
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: '#94A3B8',
+                    fontFamily: ff,
+                    marginBottom: '4px',
+                  }}
+                >
+                  {otherUser}'s notes
+                </div>
+                <div
+                  style={{
+                    padding: '8px 10px',
+                    fontSize: '12px',
+                    fontFamily: ff,
+                    background: '#F8FAFC',
+                    border: '1px solid #F1F5F9',
+                    borderRadius: '6px',
+                    color: '#64748B',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {otherNote}
+                </div>
+              </div>
+            )}
+            {!currentUser && (
+              <div style={{ fontSize: '12px', color: '#94A3B8', fontFamily: ff }}>
+                Select a user above to add notes.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── User Picker ───────────────────────── */
+
+function UserPicker({
+  currentUser,
+  onChange,
+  isOnline,
+}: {
+  currentUser: UserName | null;
+  onChange: (u: UserName | null) => void;
+  isOnline: boolean;
+}) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+      {!isOnline && (
+        <div
+          title="Offline — changes won't sync"
+          style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            background: '#EF4444',
+            flexShrink: 0,
+          }}
+        />
+      )}
+      {(['Pavel', 'Vahid'] as UserName[]).map((name) => (
+        <button
+          key={name}
+          onClick={() => onChange(currentUser === name ? null : name)}
+          style={{
+            padding: '4px 12px',
+            fontSize: '12px',
+            fontWeight: 600,
+            fontFamily: ff,
+            border: currentUser === name ? '2px solid #3B82F6' : '2px solid #E2E8F0',
+            borderRadius: '16px',
+            cursor: 'pointer',
+            background: currentUser === name ? '#EFF6FF' : '#FFF',
+            color: currentUser === name ? '#1D4ED8' : '#64748B',
+            transition: 'all 0.15s ease',
+          }}
+        >
+          {name}
+        </button>
+      ))}
     </div>
   );
 }
@@ -291,16 +540,30 @@ function SpeakerCard({ sp }: { sp: Speaker }) {
 export default function App() {
   const [tab, setTab] = useState<Tab>('schedule');
   const [dayFilter, setDayFilter] = useState<DayFilter>('all');
-  const [trackFilter, setTrackFilter] = useState<TrackFilter>('all');
+  const [mySessionsFilter, setMySessionsFilter] = useState(false);
   const [speakerSearch, setSpeakerSearch] = useState('');
+
+  const [currentUser, setCurrentUser] = useState<UserName | null>(() => {
+    const stored = localStorage.getItem('rac2026_user');
+    return stored === 'Pavel' || stored === 'Vahid' ? stored : null;
+  });
+
+  const handleUserChange = useCallback((u: UserName | null) => {
+    setCurrentUser(u);
+    if (u) localStorage.setItem('rac2026_user', u);
+    else localStorage.removeItem('rac2026_user');
+  }, []);
+
+  const { isOnline, isAttending, getNote, toggleAttendance, saveSpeakerNote } =
+    useConferenceData(currentUser);
 
   const filteredSessions = useMemo(() => {
     return sessions.filter((s) => {
       if (dayFilter !== 'all' && s.day !== dayFilter) return false;
-      if (trackFilter !== 'all' && s.track !== trackFilter) return false;
+      if (mySessionsFilter && currentUser && !isAttending(s.id, currentUser)) return false;
       return true;
     });
-  }, [dayFilter, trackFilter]);
+  }, [dayFilter, mySessionsFilter, currentUser, isAttending]);
 
   const groupedByDay = useMemo(() => {
     const groups: Record<string, Session[]> = {};
@@ -383,6 +646,15 @@ export default function App() {
           >
             International conference on encoding legislation as machine-executable rules &mdash;
             spanning governance, tools, and engineering.
+            {' '}
+            <a
+              href="https://rules-as-code.yellenge.nl/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'rgba(255,255,255,0.85)', textDecoration: 'underline' }}
+            >
+              Conference website &rarr;
+            </a>
           </p>
           <div
             style={{
@@ -461,89 +733,63 @@ export default function App() {
           </div>
         </div>
 
-        {/* Filters */}
-        {tab === 'schedule' && (
-          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-            <span style={{ fontSize: '12px', color: '#94A3B8', fontFamily: ff, marginRight: '4px' }}>
-              Filter:
-            </span>
-            {(['all', 'March 10', 'March 11'] as DayFilter[]).map((d) => (
-              <Pill
-                key={d}
-                label={d === 'all' ? 'All Days' : d}
-                active={dayFilter === d}
-                onClick={() => setDayFilter(d)}
-              />
-            ))}
-            <span style={{ color: '#E2E8F0', margin: '0 4px' }}>|</span>
-            {(['all', 'Track 1', 'Track 2', 'Track 3'] as TrackFilter[]).map((t) => (
-              <Pill
-                key={t}
-                label={t === 'all' ? 'All Tracks' : `${t}`}
-                active={trackFilter === t}
-                onClick={() => setTrackFilter(t)}
-              />
-            ))}
-          </div>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Filters */}
+          {tab === 'schedule' && (
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              <span style={{ fontSize: '12px', color: '#94A3B8', fontFamily: ff, marginRight: '4px' }}>
+                Filter:
+              </span>
+              {(['all', 'March 10', 'March 11'] as DayFilter[]).map((d) => (
+                <Pill
+                  key={d}
+                  label={d === 'all' ? 'All Days' : d}
+                  active={dayFilter === d}
+                  onClick={() => setDayFilter(d)}
+                />
+              ))}
+              {currentUser && (
+                <>
+                  <span style={{ color: '#E2E8F0', margin: '0 4px' }}>|</span>
+                  <Pill
+                    label="My Sessions"
+                    active={mySessionsFilter}
+                    onClick={() => setMySessionsFilter(!mySessionsFilter)}
+                  />
+                </>
+              )}
+            </div>
+          )}
 
-        {tab === 'speakers' && (
-          <input
-            type="text"
-            placeholder="Search speakers..."
-            value={speakerSearch}
-            onChange={(e) => setSpeakerSearch(e.target.value)}
-            style={{
-              padding: '6px 14px',
-              fontSize: '13px',
-              fontFamily: ff,
-              border: '1px solid #E2E8F0',
-              borderRadius: '8px',
-              outline: 'none',
-              width: '240px',
-              background: '#FFF',
-              color: '#0F172A',
-            }}
-          />
-        )}
+          {tab === 'speakers' && (
+            <input
+              type="text"
+              placeholder="Search speakers..."
+              value={speakerSearch}
+              onChange={(e) => setSpeakerSearch(e.target.value)}
+              style={{
+                padding: '6px 14px',
+                fontSize: '13px',
+                fontFamily: ff,
+                border: '1px solid #E2E8F0',
+                borderRadius: '8px',
+                outline: 'none',
+                width: '240px',
+                background: '#FFF',
+                color: '#0F172A',
+              }}
+            />
+          )}
+
+          <span style={{ color: '#E2E8F0' }}>|</span>
+          <UserPicker currentUser={currentUser} onChange={handleUserChange} isOnline={isOnline} />
+        </div>
       </div>
 
       {/* ── Content ────────── */}
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 32px 80px' }}>
         {tab === 'schedule' && (
           <>
-            {/* Track legend */}
-            <div
-              style={{
-                display: 'flex',
-                gap: '20px',
-                marginBottom: '32px',
-                padding: '14px 20px',
-                background: '#FFF',
-                border: '1px solid #E2E8F0',
-                borderRadius: '10px',
-                flexWrap: 'wrap',
-              }}
-            >
-              {(Object.entries(trackColors) as [Track, string][])
-                .filter(([t]) => t !== 'Tracks 1&2')
-                .map(([t, c]) => (
-                  <div key={t} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <div
-                      style={{
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        background: c,
-                      }}
-                    />
-                    <span style={{ fontSize: '12px', color: '#475569', fontWeight: 500, fontFamily: ff }}>
-                      {t}: {trackLabels[t]}
-                    </span>
-                  </div>
-                ))}
-            </div>
-
             {Object.entries(groupedByDay).map(([day, daySessions]) => {
               const rounds: Record<number, Session[]> = {};
               daySessions.forEach((s) => {
@@ -635,7 +881,13 @@ export default function App() {
                             }}
                           >
                             {roundSessions.map((s) => (
-                              <SessionCard key={s.id} s={s} />
+                              <SessionCard
+                                key={s.id}
+                                s={s}
+                                currentUser={currentUser}
+                                isAttending={isAttending}
+                                onToggle={toggleAttendance}
+                              />
                             ))}
                           </div>
                         </div>
@@ -667,7 +919,13 @@ export default function App() {
               }}
             >
               {filteredSpeakers.map((sp) => (
-                <SpeakerCard key={sp.name} sp={sp} />
+                <SpeakerCard
+                  key={sp.name}
+                  sp={sp}
+                  currentUser={currentUser}
+                  getNote={getNote}
+                  onSaveNote={saveSpeakerNote}
+                />
               ))}
             </div>
           </>
