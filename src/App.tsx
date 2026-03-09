@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { speakers, Speaker } from './data/speakers';
 import { sessions, Session, trackColors, trackLabels } from './data/sessions';
 import { useConferenceData } from './hooks/useConferenceData';
@@ -9,6 +9,18 @@ const mono = "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace";
 type Tab = 'schedule' | 'speakers';
 type DayFilter = 'all' | 'March 10' | 'March 11';
 type UserName = 'Pavel' | 'Vahid';
+
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < breakpoint);
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    setIsMobile(mq.matches);
+    return () => mq.removeEventListener('change', handler);
+  }, [breakpoint]);
+  return isMobile;
+}
 
 /* ── tiny helpers ───────────────────────── */
 
@@ -139,11 +151,13 @@ function SessionCard({
   currentUser,
   isAttending,
   onToggle,
+  compact,
 }: {
   s: Session;
   currentUser: UserName | null;
   isAttending: (sessionId: number, userName: UserName) => boolean;
   onToggle: (sessionId: number) => void;
+  compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const tc = trackColors[s.track];
@@ -159,7 +173,7 @@ function SessionCard({
       }}
       onClick={() => setOpen(!open)}
     >
-      <div style={{ padding: '20px 24px' }}>
+      <div style={{ padding: compact ? '14px 14px' : '20px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
           <Badge label={s.track} bg={tc + '18'} color={tc} />
           <Badge label={trackLabels[s.track]} bg="#F8FAFC" color="#64748B" />
@@ -199,7 +213,7 @@ function SessionCard({
       {open && (
         <div
           style={{
-            padding: '0 24px 20px',
+            padding: compact ? '0 14px 14px' : '0 24px 20px',
             borderTop: '1px solid #F1F5F9',
             paddingTop: '16px',
           }}
@@ -538,6 +552,7 @@ function UserPicker({
 /* ── App ────────────────────────────────── */
 
 export default function App() {
+  const mobile = useIsMobile();
   const [tab, setTab] = useState<Tab>('schedule');
   const [dayFilter, setDayFilter] = useState<DayFilter>('all');
   const [mySessionsFilter, setMySessionsFilter] = useState(false);
@@ -591,7 +606,7 @@ export default function App() {
       <div
         style={{
           background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #0F4C75 100%)',
-          padding: '56px 32px 48px',
+          padding: mobile ? '36px 16px 32px' : '56px 32px 48px',
           color: '#FFF',
           position: 'relative',
           overflow: 'hidden',
@@ -624,7 +639,7 @@ export default function App() {
           </div>
           <h1
             style={{
-              fontSize: '36px',
+              fontSize: mobile ? '26px' : '36px',
               fontWeight: 700,
               letterSpacing: '-0.8px',
               lineHeight: 1.15,
@@ -707,39 +722,43 @@ export default function App() {
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
           borderBottom: '1px solid #E2E8F0',
-          padding: '0 32px',
-          height: '52px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          padding: mobile ? '8px 12px' : '0 32px',
+          ...(mobile
+            ? { display: 'flex', flexDirection: 'column' as const, gap: '8px' }
+            : { height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }),
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '14px', fontWeight: 600, color: '#0F172A', fontFamily: ff }}>
-            RaC 2026
-          </span>
-          <span style={{ color: '#CBD5E1' }}>|</span>
-          <div
-            style={{
-              display: 'flex',
-              gap: '2px',
-              background: '#F1F5F9',
-              padding: '3px',
-              borderRadius: '10px',
-            }}
-          >
-            <Pill label="Schedule" active={tab === 'schedule'} onClick={() => setTab('schedule')} />
-            <Pill label="Speakers" active={tab === 'speakers'} onClick={() => setTab('speakers')} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: mobile ? 'space-between' : undefined }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: '#0F172A', fontFamily: ff }}>
+              RaC 2026
+            </span>
+            <span style={{ color: '#CBD5E1' }}>|</span>
+            <div
+              style={{
+                display: 'flex',
+                gap: '2px',
+                background: '#F1F5F9',
+                padding: '3px',
+                borderRadius: '10px',
+              }}
+            >
+              <Pill label="Schedule" active={tab === 'schedule'} onClick={() => setTab('schedule')} />
+              <Pill label="Speakers" active={tab === 'speakers'} onClick={() => setTab('speakers')} />
+            </div>
           </div>
+          <UserPicker currentUser={currentUser} onChange={handleUserChange} isOnline={isOnline} />
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: mobile ? '6px' : '12px', flexWrap: 'wrap' }}>
           {/* Filters */}
           {tab === 'schedule' && (
-            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-              <span style={{ fontSize: '12px', color: '#94A3B8', fontFamily: ff, marginRight: '4px' }}>
-                Filter:
-              </span>
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+              {!mobile && (
+                <span style={{ fontSize: '12px', color: '#94A3B8', fontFamily: ff, marginRight: '4px' }}>
+                  Filter:
+                </span>
+              )}
               {(['all', 'March 10', 'March 11'] as DayFilter[]).map((d) => (
                 <Pill
                   key={d}
@@ -774,20 +793,25 @@ export default function App() {
                 border: '1px solid #E2E8F0',
                 borderRadius: '8px',
                 outline: 'none',
-                width: '240px',
+                width: mobile ? '100%' : '240px',
                 background: '#FFF',
                 color: '#0F172A',
+                boxSizing: 'border-box' as const,
               }}
             />
           )}
 
-          <span style={{ color: '#E2E8F0' }}>|</span>
-          <UserPicker currentUser={currentUser} onChange={handleUserChange} isOnline={isOnline} />
+          {!mobile && (
+            <>
+              <span style={{ color: '#E2E8F0' }}>|</span>
+              <UserPicker currentUser={currentUser} onChange={handleUserChange} isOnline={isOnline} />
+            </>
+          )}
         </div>
       </div>
 
       {/* ── Content ────────── */}
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 32px 80px' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: mobile ? '24px 12px 60px' : '40px 32px 80px' }}>
         {tab === 'schedule' && (
           <>
             {Object.entries(groupedByDay).map(([day, daySessions]) => {
@@ -876,7 +900,7 @@ export default function App() {
                           <div
                             style={{
                               display: 'grid',
-                              gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+                              gridTemplateColumns: mobile ? '1fr' : 'repeat(auto-fill, minmax(340px, 1fr))',
                               gap: '12px',
                             }}
                           >
@@ -887,6 +911,7 @@ export default function App() {
                                 currentUser={currentUser}
                                 isAttending={isAttending}
                                 onToggle={toggleAttendance}
+                                compact={mobile}
                               />
                             ))}
                           </div>
@@ -914,8 +939,8 @@ export default function App() {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                gap: '16px',
+                gridTemplateColumns: mobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))',
+                gap: mobile ? '12px' : '16px',
               }}
             >
               {filteredSpeakers.map((sp) => (
@@ -937,7 +962,7 @@ export default function App() {
         style={{
           background: '#0F172A',
           color: '#94A3B8',
-          padding: '24px 32px',
+          padding: mobile ? '20px 12px' : '24px 32px',
           fontSize: '13px',
           fontFamily: ff,
           textAlign: 'center',
